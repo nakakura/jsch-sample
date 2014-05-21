@@ -3,22 +3,32 @@ import java.io.*;
 
 public class Main {
 	public static void main(String args[]){
-		NetworkAddress nw = new NetworkAddress("115.69.229.18", 29);
+		if(args.length != 5){
+			System.out.println("java -jar Main.jar USERNAME PASSWORD NETWORKADDRESS MASK COMMANDFILEPATH");
+			System.exit(0);
+		}
+		
+		String user = args[0];
+		String pass = args[1];
+		String network = args[2];
+		int mask = Integer.parseInt(args[3]);
+		String commandFilePath = args[4];
+		NetworkAddress nw = new NetworkAddress(network, mask);
+		Commands command = new Commands(commandFilePath);
+		
+		ArrayList<String> commandList = command.commands();
 		ArrayList<String> list = nw.addressList();
 		for(String address: list){
 			try{
 				if(Ping.ping(address)){
 					System.out.println("exist: " + address);
-					//同一サブネット上のマシンを一括で操作する場合はここで
+					SSHManager.startShell(address, "user", "password", commandList);
 				}
 			} catch(Exception e){
 				
 			}
 		}
 		
-		Commands command = new Commands("./command.txt");
-		ArrayList<String> commandList = command.commands();
-		SSHManager.startShell("115.69.229.18", "user", "password", commandList);
 		//SSHManager.scp("115.69.229.18", "user", "password", commandList);
 	}
 }
