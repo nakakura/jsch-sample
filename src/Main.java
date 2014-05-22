@@ -2,12 +2,12 @@ import java.util.ArrayList;
 import java.io.*;
 
 public class Main {
+
 	public static void main(String args[]){
 		if(args.length != 5){
-			System.out.println("java -jar Main.jar USERNAME PASSWORD NETWORKADDRESS MASK COMMANDFILEPATH");
+			System.out.println("java -jar jsch.jar USERNAME PASSWORD NETWORKADDRESS MASK COMMANDFILEPATH");
 			System.exit(0);
 		}
-		
 		String user = args[0];
 		String pass = args[1];
 		String network = args[2];
@@ -22,15 +22,43 @@ public class Main {
 			try{
 				if(Ping.ping(address)){
 					System.out.println("exist: " + address);
-					SSHManager.startShell(address, "user", "password", commandList);
+					SSHManager.startShell(address, user, pass, commandList);
 				}
 			} catch(Exception e){
 				
 			}
 		}
-		
-		//SSHManager.scp("115.69.229.18", "user", "password", commandList);
 	}
+	/*/
+	public static void main(String args[]){
+		if(args.length != 5){
+			System.out.println("java -jar scp.jar USERNAME PASSWORD NETWORKADDRESS MASK COMMANDFILEPATH");
+			System.exit(0);
+		}
+		String user = args[0];
+		String pass = args[1];
+		String network = args[2];
+		int mask = Integer.parseInt(args[3]);
+		String uploadFilePath = args[4];
+		NetworkAddress nw = new NetworkAddress(network, mask);
+		
+		ArrayList<String> fileList = new ArrayList<String>();
+		fileList.add(uploadFilePath);
+		
+		ArrayList<String> list = nw.addressList();
+		for(String address: list){
+			try{
+				if(Ping.ping(address)){
+					System.out.println("exist: " + address);
+					SSHManager.scp(address, user, pass, fileList);
+				}
+			} catch(Exception e){
+				
+			}
+		}
+	}
+	*/
+
 }
 
 class Commands{

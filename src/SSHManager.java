@@ -41,10 +41,19 @@ public class SSHManager {
 
 			channel.setOutputStream(new ByteBufferBackedOutputStream(buf));
 
-			channel.connect(3 * 1000);
+			channel.connect(30000);
 			
 			for(String command: commands){
+				System.out.println(command);
 				print.println(command);
+				Thread.sleep(100);
+			}
+		}
+		catch(com.jcraft.jsch.JSchException e){
+			System.out.println(e.getMessage());
+			if(e.getMessage().matches(".*timed out.*")){
+				System.out.println("retry");
+				startShell(address, user, passwd, commands);
 			}
 		}
 		catch(Exception e){
@@ -65,14 +74,22 @@ public class SSHManager {
 			session.connect(30000); 
 
 			ChannelSftp channel=(ChannelSftp)session.openChannel("sftp");
-			channel.connect();
+			channel.connect(30000);
 			
 			for(String file: filePaths){
+				System.out.println("upload " + file);
 				channel.put(file, "./");
 			}
 			
 			channel.disconnect();
 			session.disconnect();
+		}
+		catch(com.jcraft.jsch.JSchException e){
+			System.out.println(e.getMessage());
+			if(e.getMessage().matches(".*timed out.*")){
+				System.out.println("retry");
+				scp(address, user, passwd, filePaths);
+			}
 		}
 		catch(Exception e){
 			System.out.println(e);
@@ -105,8 +122,8 @@ class ByteBufferBackedOutputStream extends OutputStream{
 	public synchronized void write(int b) throws IOException {
 		this.sb.append((char)b);
 		if(b == 10){
-			System.out.print("--");
-			System.out.print(getString());
+			//System.out.print("--");
+			//System.out.print(getString());
 		}
 	}
 
